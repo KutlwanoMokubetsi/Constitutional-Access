@@ -1,0 +1,1 @@
+const SuperAdminPage = () => <div>Super Admin Page</div>; export default SuperAdminPage;

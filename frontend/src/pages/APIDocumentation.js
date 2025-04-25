@@ -1,0 +1,1 @@
+const APIDocumentation = () => <div>API Docs</div>; export default APIDocumentation;
