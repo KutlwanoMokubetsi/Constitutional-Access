@@ -8,7 +8,9 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const searchRoutes = require('./routes/search'); 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://gray-flower-0a4bfd703.6.azurestaticapps.net'
+}));
 app.use(bodyParser.json());
 
 
