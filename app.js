@@ -8,11 +8,18 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const searchRoutes = require('./routes/search'); 
 
 const app = express();
-app.use(cors({
-  origin: 'https://gray-flower-0a4bfd703.6.azurestaticapps.net'
-}));
-app.use(bodyParser.json());
 
+const corsOptions = {
+  origin: 'https://gray-flower-0a4bfd703.6.azurestaticapps.net',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // handle pre-flight requests
+
+app.use(bodyParser.json());
 
 if (process.env.NODE_ENV !== 'test') {
   mongoose.connect(process.env.MONGO_URL)
@@ -21,6 +28,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 app.use("/api", uploadRoutes);
-app.use("/api/search", searchRoutes);  
+app.use("/api/search", searchRoutes);
 
 module.exports = app;
