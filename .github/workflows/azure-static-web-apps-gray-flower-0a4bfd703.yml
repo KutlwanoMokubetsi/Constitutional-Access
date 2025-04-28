@@ -22,7 +22,6 @@ jobs:
           
       - name: Install Dependencies and Build
         run: |
-          cd frontend  # Use your actual frontend directory if it's not at root
           npm install
           npm run build
 
