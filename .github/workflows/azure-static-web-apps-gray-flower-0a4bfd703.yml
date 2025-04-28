@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies and Build
         run: |
           npm install
-          npm run build
+          npm run build  # This assumes your React app is in the root directory
 
       - name: Build And Deploy
         id: builddeploy
@@ -33,15 +33,15 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          app_location: "/frontend"  # Set this correctly based on your folder structure
-          api_location: ""  # API location if applicable, or leave empty if none
-          output_location: "build"  # Ensure this matches the output directory from the build
+          app_location: "/"  # Since the frontend is in the root directory
+          api_location: ""  # Empty because the backend is a separate app
+          output_location: "build"  # Built app content directory (created after `npm run build`)
           ###### End of Repository/Build Configurations ######
         env:
           REACT_APP_AUTH0_DOMAIN: ${{ secrets.REACT_APP_AUTH0_DOMAIN }}
           REACT_APP_AUTH0_CLIENT_ID: ${{ secrets.REACT_APP_AUTH0_CLIENT_ID }}
           REACT_APP_SEARCH_BACKEND_URL: ${{ secrets.REACT_APP_SEARCH_BACKEND_URL }}
-          REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }}
+          REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }}  # Ensure this URL points to your backend API
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
