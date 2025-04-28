@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const uploadRoutes = require("./admin_backend/routes/uploadRoutes");
-const searchRoutes = require('./admin_backend/routes/search'); 
+const uploadRoutes = require("./routes/uploadRoutes");
+const searchRoutes = require('./routes/search'); 
 
 const app = express();
 
