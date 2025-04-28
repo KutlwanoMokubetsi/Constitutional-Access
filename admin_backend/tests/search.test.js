@@ -1,18 +1,19 @@
-const request = require("supertest");
-const app = require("../app"); // assuming index.js exports your Express app 
-const Metadata = require("../models/Metadata");
+jest.mock("../models/Metadata", () => {
+  return {
+    find: jest.fn(), // we will override it in the tests
+  };
+});
 
-// Mock Metadata model
-jest.mock("../models/Metadata");
+const request = require("supertest");
+const app = require("../app");
+const Metadata = require("../models/Metadata");
 
 describe("GET /api/search", () => {
   beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
   });
 
   it("should return formatted search results", async () => {
-    // Fake MongoDB documents
     const mockResults = [
       {
         _id: "1",
@@ -54,3 +55,4 @@ describe("GET /api/search", () => {
     expect(res.body).toHaveProperty("error", "Internal Server Error");
   });
 });
+
