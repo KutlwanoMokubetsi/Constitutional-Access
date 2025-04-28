@@ -1,6 +1,12 @@
+jest.mock('../utils/azureStorage', () => {
+  const multer = require('multer');
+  return {
+    azureStorage: multer.memoryStorage(), // use in-memory storage just for tests
+  };
+});
 
 const request = require('supertest');
-const app = require('../app'); 
+const app = require('../app');
 
 describe('Upload API', () => {
   it('should upload files successfully', async () => {
