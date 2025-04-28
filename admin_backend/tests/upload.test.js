@@ -1,7 +1,5 @@
 const request = require('supertest');
 const app = require('../app');
-const Metadata = require('../models/Metadata');
-const multer = require('multer');
 
 // Mock Azure Storage
 jest.mock('../utils/azureStorage', () => ({
@@ -13,30 +11,16 @@ jest.mock('../utils/azureStorage', () => ({
   },
 }));
 
-// Mock Metadata model
+// Mock Metadata model as a constructor
 jest.mock('../models/Metadata', () => {
-  return {
-    find: jest.fn().mockResolvedValue([
-      {
-        _id: "1",
-        fileName: "Test File",
-        description: "This is a test",
-        category: "Documents",
-        fileUrl: "http://localhost/test.pdf",
-        uploadedBy: "Alice",
-        uploadedAt: new Date(),
-      },
-    ]),
+  return jest.fn().mockImplementation((data) => ({
+    ...data,
     save: jest.fn().mockResolvedValue({
       _id: "1",
-      fileName: "Test File",
-      description: "This is a test",
-      category: "Documents",
-      fileUrl: "http://localhost/test.pdf",
-      uploadedBy: "Alice",
+      ...data,
       uploadedAt: new Date(),
     }),
-  };
+  }));
 });
 
 describe('POST /api/upload', () => {
@@ -46,8 +30,7 @@ describe('POST /api/upload', () => {
       .attach('files', Buffer.from('dummy file content'), 'testfile.txt');
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('message');
-    expect(res.body.message).toBe('Files uploaded successfully');
+    expect(res.body).toHaveProperty('message', 'Files uploaded successfully');
   });
 
   it('should successfully upload metadata', async () => {
@@ -66,8 +49,7 @@ describe('POST /api/upload', () => {
       .set('Content-Type', 'application/json');
 
     expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty('message');
-    expect(res.body.message).toBe('Metadata saved');
+    expect(res.body).toHaveProperty('message', 'Metadata saved');
     expect(res.body.metadata).toHaveProperty('fileName', 'testfile.txt');
     expect(res.body.metadata).toHaveProperty('fileUrl', 'http://localhost/testfile.txt');
   });
