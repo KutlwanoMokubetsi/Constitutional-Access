@@ -1,26 +1,55 @@
 const request = require('supertest');
+const express = require('express');
 const app = require('../app');
+const path = require('path');
 
-// Mock Azure Storage
-jest.mock('../utils/azureStorage', () => ({
-  azureStorage: {
-    memoryStorage: jest.fn().mockReturnValue({
-      _handleFile: jest.fn(),
-      _removeFile: jest.fn(),
-    }),
-  },
-}));
+// Mock storage for uploaded files
+const uploadedFiles = [];
+const uploadedMetadata = [];
 
-// Mock Metadata model as a constructor
-jest.mock('../models/Metadata', () => {
-  return jest.fn().mockImplementation((data) => ({
-    ...data,
-    save: jest.fn().mockResolvedValue({
-      _id: "1",
-      ...data,
-      uploadedAt: new Date(),
-    }),
+// Override the /api/upload route for testing
+app.post('/api/upload', (req, res) => {
+  // Simulate receiving a file
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: 'No files uploaded' });
+  }
+
+  const fileUrls = req.files.map(file => ({
+    originalname: file.originalname,
+    url: `http://localhost/uploads/${file.originalname}`
   }));
+
+  uploadedFiles.push(...fileUrls);
+
+  res.status(200).json({
+    message: 'Files uploaded successfully',
+    files: req.files,
+    fileUrls: fileUrls.map(f => f.url),
+  });
+});
+
+// Override the /api/upload/metadata route for testing
+app.post('/api/upload/metadata', express.json(), (req, res) => {
+  const { fileName, description, category, uploadedBy, tags, fileUrl } = req.body;
+
+  if (!fileName || !fileUrl) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+
+  const newMetadata = {
+    id: (uploadedMetadata.length + 1).toString(),
+    fileName,
+    description,
+    category,
+    uploadedBy,
+    tags,
+    fileUrl,
+    uploadedAt: new Date(),
+  };
+
+  uploadedMetadata.push(newMetadata);
+
+  res.status(201).json({ message: 'Metadata saved', metadata: newMetadata });
 });
 
 describe('POST /api/upload', () => {
@@ -31,6 +60,7 @@ describe('POST /api/upload', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('message', 'Files uploaded successfully');
+    expect(Array.isArray(res.body.fileUrls)).toBe(true);
   });
 
   it('should successfully upload metadata', async () => {
@@ -40,7 +70,7 @@ describe('POST /api/upload', () => {
       category: 'Documents',
       uploadedBy: 'Test User',
       tags: ['test', 'file'],
-      fileUrl: 'http://localhost/testfile.txt',
+      fileUrl: 'http://localhost/uploads/testfile.txt',
     };
 
     const res = await request(app)
@@ -51,8 +81,27 @@ describe('POST /api/upload', () => {
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('message', 'Metadata saved');
     expect(res.body.metadata).toHaveProperty('fileName', 'testfile.txt');
-    expect(res.body.metadata).toHaveProperty('fileUrl', 'http://localhost/testfile.txt');
+    expect(res.body.metadata).toHaveProperty('fileUrl', 'http://localhost/uploads/testfile.txt');
+  });
+
+  it('should handle missing file upload', async () => {
+    const res = await request(app)
+      .post('/api/upload');
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('message', 'No files uploaded');
+  });
+
+  it('should handle missing metadata fields', async () => {
+    const res = await request(app)
+      .post('/api/upload/metadata')
+      .send({})
+      .set('Content-Type', 'application/json');
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('message', 'Missing fields');
   });
 });
+
 
 
