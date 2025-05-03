@@ -34,6 +34,4 @@ if (process.env.NODE_ENV !== 'test') {
 app.use("/api", uploadRoutes);
 app.use("/api/search", searchRoutes);
 
-// Export app for server and testing
 module.exports = app;
-
