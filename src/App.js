@@ -1,6 +1,6 @@
 // src/App.js
 import React from "react";
-import { BrowserRouter as Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import SuperAdminPage from "./pages/SuperAdminPage"; // Add this import
@@ -8,6 +8,7 @@ import SearchPage from "./pages/SearchPage";
 import Navbar from "./components/Navbar";
 import APIDocumentation from "./pages/APIDocumentation";
 import PrivateRoute from "./PrivateRoute";
+import UploadedFilesPage from "./components/admin/UploadedFiles"; 
 
 function App() {
   return (
@@ -33,6 +34,15 @@ function App() {
                 </PrivateRoute>
               }
             />
+
+            <Route
+              path="/uploaded-files"
+              element={
+                <PrivateRoute>
+                  <UploadedFilesPage />
+                </PrivateRoute>
+              }
+            />  
             <Route path="/search" element={<SearchPage />} />
             <Route path="/api-docs" element={<APIDocumentation />} />
           </Routes>
