@@ -18,7 +18,7 @@
     "mongoose": "^8.14.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.5.0",
+    "react-router-dom": "^7.5.3",
     "react-scripts": "^5.0.1",
     "styled-components": "^6.1.17",
     "web-vitals": "^2.1.4"
@@ -51,5 +51,19 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "jest.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Constitutional-Archive/constitutional-access.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Constitutional-Archive/constitutional-access/issues"
+  },
+  "homepage": "https://github.com/Constitutional-Archive/constitutional-access#readme"
 }

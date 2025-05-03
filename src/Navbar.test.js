@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Navbar from '../Navbar'; // adjust path as needed
+import Navbar from '../components/Navbar'; // adjust path as needed
 import { useAuth0 } from '@auth0/auth0-react';
 
 // Mock Auth0
