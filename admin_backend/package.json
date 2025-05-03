@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node server.js",
-  "predeploy": "echo Skipping tests before deploy",
-  "deploy": "npm run build && echo Deploying...",
-  "test": "echo \"Skipping tests on deploy\" && exit 0"
+    "start": "node server.js",
+    "predeploy": "echo Skipping tests before deploy",
+    "deploy": "npm run build && echo Deploying...",
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -17,8 +17,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
-    "mongodb": "^6.15.0",
-    "mongoose": "^8.13.2",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.1",
     "multer": "^1.4.5-lts.2",
     "multer-azure-blob-storage": "^1.2.0"
   },

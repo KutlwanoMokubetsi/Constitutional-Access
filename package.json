@@ -14,6 +14,8 @@
     "axios": "^1.8.4",
     "framer-motion": "^12.7.4",
     "lucide-react": "^0.487.0",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.14.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.5.0",
@@ -21,14 +23,13 @@
     "styled-components": "^6.1.17",
     "web-vitals": "^2.1.4"
   },
-"scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "test": "react-scripts test --watchAll",
-  "coverage": "react-scripts test --coverage",
-  "eject": "react-scripts eject"
-}
-,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --watchAll",
+    "coverage": "react-scripts test --coverage",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -51,5 +52,4 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0"
   }
-  }
-
+}
