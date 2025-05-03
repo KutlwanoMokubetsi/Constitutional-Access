@@ -1,170 +1,131 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Shield, Users, ChevronLeft, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import axios from 'axios';
+import { Shield, Users, CheckCircle2, XCircle } from 'lucide-react';
 
 const SuperAdminPage = () => {
-  const navigate = useNavigate();
+  const { user } = useAuth0();
+  const roles = user?.['https://constifind-api.com/roles'] || [];
 
-  // Mock data for existing admins
-  const [admins, setAdmins] = useState([
-    { id: 1, name: 'Primary Admin', email: 'admin@example.com', lastActive: '2 hours ago' },
-    { id: 2, name: 'Secondary Admin', email: 'admin2@example.com', lastActive: '1 day ago' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for pending admin requests
-  const [pendingRequests, setPendingRequests] = useState([
-    { 
-      id: 3, 
-      name: 'New Applicant', 
-      email: 'applicant@example.com', 
-      requestDate: '2023-05-15',
-      status: 'pending'
-    },
-    { 
-      id: 4, 
-      name: 'Another Applicant', 
-      email: 'another@example.com', 
-      requestDate: '2023-05-16',
-      status: 'pending'
+  // ✅ Fetch users with roles
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/auth0/users-with-roles');
+      setUsers(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching users:', err);
     }
-  ]);
-
-  const handleApprove = (requestId) => {
-    const request = pendingRequests.find(req => req.id === requestId);
-    if (!request) return;
-
-    // Add to admins list
-    const newAdmin = {
-      id: requestId,
-      name: request.name,
-      email: request.email,
-      lastActive: 'Just now'
-    };
-
-    setAdmins([...admins, newAdmin]);
-    setPendingRequests(pendingRequests.filter(req => req.id !== requestId));
   };
 
-  const handleReject = (requestId) => {
-    setPendingRequests(pendingRequests.filter(req => req.id !== requestId));
+  // ✅ Assign admin role
+  const assignAdmin = async (userId) => {
+    try {
+      await axios.post('http://localhost:5000/api/auth0/assign-admin', { userId });
+      fetchUsers();
+    } catch (err) {
+      console.error('Error assigning admin role:', err);
+    }
   };
+
+  // ✅ Revoke admin role
+  const revokeAdmin = async (userId) => {
+    try {
+      await axios.post('http://localhost:5000/api/auth0/revoke-admin', { userId });
+      fetchUsers();
+    } catch (err) {
+      console.error('Error revoking admin role:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // ✅ Authorization check
+  if (!roles.includes('superadmin')) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold text-red-600">Unauthorized Access</h2>
+        <p>Only superadmins can access this page.</p>
+      </div>
+    );
+  }
+
+  // ✅ Role filters
+  const usersWithNoRoles = users.filter(u => u.roles.length === 0);
+  const usersWithAdminRole = users.filter(u => u.roles.includes('admin'));
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <article className="bg-white rounded-lg shadow p-6">
-        <header className="mb-8">
-          <nav>
-            <button 
-              onClick={() => navigate('/admin')}
-              className="flex items-center text-indigo-600 hover:text-indigo-800 mb-2"
-            >
-              <ChevronLeft className="h-5 w-5 mr-1" />
-              Back to Admin Dashboard
-            </button>
+    <div className="max-w-5xl mx-auto p-6">
+      <header className="mb-8 flex items-center">
+        <Shield className="h-8 w-8 text-purple-600 mr-2" />
+        <h1 className="text-2xl font-bold">User Role Manager</h1>
+      </header>
 
-          </nav>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-            <Shield className="h-8 w-8 text-indigo-600 mr-2" />
-            Admin Management
-          </h1>
-        </header>
+      {/* New Users */}
+      <section className="bg-white rounded-lg shadow p-6 mb-10">
+        <h2 className="text-lg font-semibold mb-4 flex items-center">
+          <Users className="h-5 w-5 text-yellow-500 mr-2" />
+          New Users (No Roles Assigned) ({usersWithNoRoles.length})
+        </h2>
+        {loading ? (
+          <p className="text-gray-500">Loading users...</p>
+        ) : (
+          <div className="space-y-4">
+            {usersWithNoRoles.map(u => (
+              <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-medium">{u.name || u.email}</h3>
+                  <p className="text-sm text-gray-600">{u.email}</p>
+                  <p className="text-sm text-gray-500">Roles: None</p>
+                </div>
+                <button
+                  onClick={() => assignAdmin(u.user_id)}
+                  className="p-2 text-green-600 hover:bg-green-50 rounded-full"
+                  title="Assign Admin"
+                >
+                  <CheckCircle2 className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
-        {/* Pending Requests Section */}
-        <section className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Clock className="h-5 w-5 text-yellow-500 mr-2" />
-            Pending Admin Requests
-          </h2>
-          
-          {pendingRequests.length > 0 ? (
-
-            <figure className="overflow-x-auto">
-              <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {pendingRequests.map((request) => (
-                    <tr key={request.id} className="hover:bg-gray-50">
-
-                      <th scope="row" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.name}</th>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{request.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{request.requestDate}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <menu className="flex space-x-2">
-                          <li>
-                            <button
-                              onClick={() => handleApprove(request.id)}
-                              className="text-green-600 hover:text-green-800 p-1 rounded-full hover:bg-green-50"
-                              title="Approve"
-                            >
-                              <CheckCircle2 className="h-5 w-5" />
-                              <span className="sr-only">Approve {request.name}</span>
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              onClick={() => handleReject(request.id)}
-                              className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50"
-                              title="Reject"
-                            >
-                              <XCircle className="h-5 w-5" />
-                              <span className="sr-only">Reject {request.name}</span>
-                            </button>
-                          </li>
-                        </menu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </figure>
-          ) : (
-            <aside className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-              <p className="text-sm text-yellow-700 flex items-center">
-                <Clock className="h-5 w-5 text-yellow-400 mr-2" />
-                No pending admin requests at this time.
-              </p>
-            </aside>
-          )}
-        </section>
-
-        {/* Current Admins Section */}
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Users className="h-5 w-5 text-indigo-600 mr-2" />
-            Current Admins
-          </h2>
-          
-          <figure className="overflow-x-auto">
-            <table className="min-w-full bg-white shadow rounded-lg overflow-hidden">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {admins.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-gray-50">
-
-                    <th scope="row" className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{admin.name}</th>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{admin.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{admin.lastActive}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </figure>
-        </section>
-      </article>
-    </main>
+      {/* Active Admins */}
+      <section className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4 flex items-center">
+          <Users className="h-5 w-5 text-blue-500 mr-2" />
+          Active Admins ({usersWithAdminRole.length})
+        </h2>
+        {loading ? (
+          <p className="text-gray-500">Loading users...</p>
+        ) : (
+          <div className="space-y-4">
+            {usersWithAdminRole.map(u => (
+              <div key={u.user_id} className="flex justify-between items-center p-4 border rounded-lg">
+                <div>
+                  <h3 className="font-medium">{u.name || u.email}</h3>
+                  <p className="text-sm text-gray-600">{u.email}</p>
+                  <p className="text-sm text-gray-500">Roles: {u.roles.join(', ')}</p>
+                </div>
+                <button
+                  onClick={() => revokeAdmin(u.user_id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+                  title="Revoke Admin"
+                >
+                  <XCircle className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 };
 
