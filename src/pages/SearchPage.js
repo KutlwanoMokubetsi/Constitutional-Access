@@ -5,14 +5,18 @@ import SearchResults from '../components/search/SearchResults';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() && selectedTags.length === 0) return;
+    if (!searchQuery.trim() && !selectedCategory) {
+      setResults([]);
+      setHasSearched(false);
+      return;
+    }
 
     setLoading(true);
     setHasSearched(true);
@@ -21,7 +25,7 @@ const SearchPage = () => {
     try {
       const query = new URLSearchParams();
       if (searchQuery.trim()) query.append('q', searchQuery.trim());
-      if (selectedTags.length > 0) query.append('tags', selectedTags.join(','));
+      if (selectedCategory) query.append('category', selectedCategory);
 
       const response = await fetch(`${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search?${query.toString()}`);
       if (!response.ok) throw new Error('Search failed');
@@ -33,7 +37,6 @@ const SearchPage = () => {
       setResults([]);
     } finally {
       setLoading(false);
-
     }
   };
 
@@ -48,8 +51,8 @@ const SearchPage = () => {
       <SearchHeader 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        selectedTags={selectedTags}
-        setSelectedTags={setSelectedTags}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
         handleSearch={handleSearch}
         handleKeyDown={handleKeyDown}
       />
@@ -59,11 +62,9 @@ const SearchPage = () => {
 
       {hasSearched && !loading && !error && (
         <SearchResults results={results} searchQuery={searchQuery} />
-
       )}
     </div>
   );
 };
 
 export default SearchPage;
-
