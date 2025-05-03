@@ -11,8 +11,7 @@ import PrivateRoute from "./PrivateRoute";
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         <div className="flex-1 w-full">
           <Routes>
@@ -39,7 +38,6 @@ function App() {
           </Routes>
         </div>
       </div>
-    </Router>
   );
 }
 

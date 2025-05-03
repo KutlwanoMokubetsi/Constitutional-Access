@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import SearchHeader from '../components/search/SearchHeader';
 import SearchResults from '../components/search/SearchResults';
