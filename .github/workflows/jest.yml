@@ -2,9 +2,9 @@ name: Run Jest Tests
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
   pull_request:
-    branches: [main]
+    branches: [develop]
 
 jobs:
   test:
@@ -16,6 +16,6 @@ jobs:
         with:
           node-version: '18'
       - name: Install Dependencies
-        run: cd backend && npm install
+        run: npm install
       - name: Run Tests
-        run: cd backend && npm test
+        run: npm test
