@@ -1,4 +1,5 @@
 // AdminPage.test.js
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
 import AdminPage from '../pages/AdminPage';
