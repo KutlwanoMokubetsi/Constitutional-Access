@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
         excerpt: doc.description || "No description available",
         type: doc.category || "Unknown",
         relevance: `${Math.floor(Math.random() * 21) + 80}%`,
-        fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search/download/${encodedPath}`,
+        fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search/download?path=${encodeURIComponent(doc.fileUrl)}`,
         uploadedAt: doc.uploadedAt,
       };
     }).filter(item => item !== null);
@@ -65,9 +65,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/download/:encodedPath", async (req, res) => {
+router.get("/download", async (req, res) => {
   try {
-    const blobPath = decodeURIComponent(req.params.encodedPath);
+    const { path } = req.query;
+    if (!path) return res.status(400).send("Missing file path.");
+
+    const blobPath = decodeURIComponent(path);
     console.log("Decoded blobPath:", blobPath);
 
     const blobUrl = `https://${process.env.ACCOUNT_NAME}.blob.core.windows.net/${process.env.CONTAINER_NAME}/${blobPath}`;
