@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { Shield, Users, CheckCircle2, XCircle } from 'lucide-react';
@@ -10,21 +10,23 @@ const SuperAdminPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
   // ✅ Fetch users with roles
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/auth0/users-with-roles');
+      const res = await axios.get(`${API_BASE}/api/auth0/users-with-roles`);
       setUsers(res.data);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching users:', err);
     }
-  };
+  }, [API_BASE]);
 
   // ✅ Assign admin role
   const assignAdmin = async (userId) => {
     try {
-      await axios.post('http://localhost:5001/api/auth0/assign-admin', { userId });
+      await axios.post(`${API_BASE}/api/auth0/assign-admin`, { userId });
       fetchUsers();
     } catch (err) {
       console.error('Error assigning admin role:', err);
@@ -34,7 +36,7 @@ const SuperAdminPage = () => {
   // ✅ Revoke admin role
   const revokeAdmin = async (userId) => {
     try {
-      await axios.post('http://localhost:5001/api/auth0/revoke-admin', { userId });
+      await axios.post(`${API_BASE}/api/auth0/revoke-admin`, { userId });
       fetchUsers();
     } catch (err) {
       console.error('Error revoking admin role:', err);
@@ -43,7 +45,7 @@ const SuperAdminPage = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   // ✅ Authorization check
   if (!roles.includes('superadmin')) {
