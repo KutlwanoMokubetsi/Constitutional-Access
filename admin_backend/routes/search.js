@@ -1,47 +1,80 @@
 const express = require("express");
 const router = express.Router();
-const Metadata = require("../models/Metadata"); // adjust path if needed
+const Metadata = require("../models/Metadata");
 
-// Simple text + tag search
+const encode = str => encodeURIComponent(str);
+
 router.get("/", async (req, res) => {
   try {
-    const { q, tags } = req.query;
+    const { q, category } = req.query;
     const query = {};
 
-    // Searching in the 'fileName', 'description', 'category', and 'uploadedBy' fields
-    if (q) {
+    // Text search
+    if (q && q.trim() !== "") {
+      const searchRegex = { $regex: q, $options: "i" };
       query.$or = [
-        { fileName: { $regex: q, $options: "i" } },
-        { description: { $regex: q, $options: "i" } },
-        { category: { $regex: q, $options: "i" } },
-        { uploadedBy: { $regex: q, $options: "i" } },
+        { fileName: searchRegex },
+        { description: searchRegex },
+        { uploadedBy: searchRegex }
       ];
     }
 
-    // Handling the 'tags' array query
-    if (tags) {
-      const tagArray = tags.split(",").map(tag => tag.trim());
-      query.tags = { $in: tagArray };
+    // Category filter
+    if (category && category.trim() !== "") {
+      query.category = category;
     }
 
-    // Query the Metadata collection
+    console.log("Executing query:", query);
+
     const results = await Metadata.find(query).sort({ uploadedAt: -1 }).limit(50);
 
-    // Format the response to match frontend expectations
-    const formattedResults = results.map(doc => ({
-      id: doc._id,
-      title: doc.fileName || "Untitled",
-      excerpt: doc.description || "No description available",
-      type: doc.category || "Unknown",
-      relevance: `${Math.floor(Math.random() * 21) + 80}%`, // 80-100%
-      fileUrl: doc.fileUrl || "", // <-- Use what’s in the DB
-      uploadedAt: doc.uploadedAt,
-    }));
+    const formattedResults = results.map(doc => {
+      const fileUrl = doc.fileUrl;
 
+      // Validate fileUrl
+      if (
+        !fileUrl ||
+        typeof fileUrl !== "string" ||
+        fileUrl.includes("http") || // avoid full URLs
+        fileUrl.includes("undefined")
+      ) {
+        console.log("Invalid fileUrl:", fileUrl);
+        return null;
+      }
+
+      console.log("Found fileUrl:", fileUrl);
+      const encodedPath = encode(fileUrl);
+
+      return {
+        id: doc._id,
+        title: doc.fileName || "Untitled",
+        excerpt: doc.description || "No description available",
+        type: doc.category || "Unknown",
+        relevance: `${Math.floor(Math.random() * 21) + 80}%`,
+        fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/search/download/${encodedPath}`,
+        uploadedAt: doc.uploadedAt,
+      };
+    }).filter(item => item !== null);
+
+    console.log("Formatted results with valid fileUrl:", formattedResults.map(r => r.fileUrl));
     res.json(formattedResults);
+
   } catch (err) {
     console.error("Search error:", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/download/:encodedPath", async (req, res) => {
+  try {
+    const blobPath = decodeURIComponent(req.params.encodedPath);
+    console.log("Decoded blobPath:", blobPath);
+
+    const blobUrl = `https://${process.env.ACCOUNT_NAME}.blob.core.windows.net/${process.env.CONTAINER_NAME}/${blobPath}`;
+    return res.redirect(blobUrl);
+  } catch (err) {
+    console.error("Redirect download error:", err.message);
+    res.status(500).send("Failed to redirect to file.");
   }
 });
 

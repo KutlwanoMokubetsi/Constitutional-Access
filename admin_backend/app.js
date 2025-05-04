@@ -11,11 +11,17 @@ const app = express();
 
 // CORS setup
 const corsOptions = {
-  origin: 'https://gray-flower-0a4bfd703.6.azurestaticapps.net',
+  origin: [
+    'https://gray-flower-0a4bfd703.6.azurestaticapps.net', // deployed frontend URL
+    'http://localhost:3000', // local frontend URL for development
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
+
+app.use(cors(corsOptions));
+
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());

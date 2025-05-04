@@ -15,10 +15,10 @@ const AdminHeader = () => {
   // Only essential admin navigation items
   const adminNavItems = [
     { 
-      name: 'Documents', 
+      name: 'File Upload', 
       path: '/admin', 
       icon: <FileText className="h-5 w-5" />,
-      current: location.pathname === '/admin'
+      current: location.pathname === '/super-admin'
     },
     { 
       name: 'Admin', 

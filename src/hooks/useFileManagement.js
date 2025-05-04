@@ -77,10 +77,11 @@ export const useFileManagement = () => {
     const metadataPayload = {
       ...metadata,
        
-      fileName: fileUrl,
+      fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
       category: metadata.category,
+      fileUrl: fileUrl
     };
   
     console.log("Sending metadata:", metadataPayload); 
