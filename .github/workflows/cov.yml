@@ -17,6 +17,8 @@ jobs:
         uses: actions/setup-node@v4
 
       - name: Install dependencies
+        run: npx jest --clearCache
+        run: npm update jest jest-cli pretty-format
         run: npm install --force
 
       - name: Run tests
