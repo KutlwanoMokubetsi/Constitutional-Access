@@ -13,7 +13,7 @@ const SuperAdminPage = () => {
   // ✅ Fetch users with roles
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/auth0/users-with-roles');
+      const res = await axios.get(`${REACT_APP_SEARCH_BACKEND_URL}/api/auth0/users-with-roles`);
       setUsers(res.data);
       setLoading(false);
     } catch (err) {
@@ -24,7 +24,7 @@ const SuperAdminPage = () => {
   // ✅ Assign admin role
   const assignAdmin = async (userId) => {
     try {
-      await axios.post('http://localhost:5001/api/auth0/assign-admin', { userId });
+      await axios.post(`${REACT_APP_SEARCH_BACKEND_URL}/api/auth0/assign-admin`, { userId });
       fetchUsers();
     } catch (err) {
       console.error('Error assigning admin role:', err);
@@ -34,7 +34,7 @@ const SuperAdminPage = () => {
   // ✅ Revoke admin role
   const revokeAdmin = async (userId) => {
     try {
-      await axios.post('http://localhost:5001/api/auth0/revoke-admin', { userId });
+      await axios.post(`${REACT_APP_SEARCH_BACKEND_URL}/api/auth0/revoke-admin`, { userId });
       fetchUsers();
     } catch (err) {
       console.error('Error revoking admin role:', err);
