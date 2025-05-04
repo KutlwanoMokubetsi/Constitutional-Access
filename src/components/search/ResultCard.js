@@ -2,11 +2,12 @@ const React = require('react');
 const { ChevronRight, Download, FileText } = require('lucide-react');
 
 const ResultCard = ({ result }) => {
+  console.log("Rendering result:", result); 
   const title = result.title || result.name || 'Untitled';
   const excerpt = result.excerpt || result.summary || 'No summary available.';
   const relevance = result.relevance || result.score || 'N/A';
   const type = result.type || result.filetype || 'Unknown';
-  const fileUrl = result.fileUrl || '#';
+  const fileUrl = result.fileUrl;
 
   return React.createElement('div', {
     className: 'bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow'
