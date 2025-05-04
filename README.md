@@ -1,6 +1,8 @@
 [![codecov](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access/branch/coverage_new/graph/badge.svg?token=ra9BZ66bio)](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access)
 
-https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access/graphs/tree.svg?token=ra9BZ66bio
+[![codecov](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access/graphs/tree.svg?token=ra9BZ66bio)](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access)
+
+
 
 # Getting Started with Create React App
 
