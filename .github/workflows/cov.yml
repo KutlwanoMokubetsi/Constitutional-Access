@@ -20,7 +20,7 @@ jobs:
         run: npm install --force
 
       - name: Update Jest
-        run: npm update jest jest-cli pretty-format
+        run: npm update jest jest-cli pretty-format --force
 
       - name: Run tests
         run: npx jest --coverage
