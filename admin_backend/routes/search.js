@@ -1,41 +1,41 @@
 const express = require("express");
 const router = express.Router();
-const Metadata = require("../models/Metadata"); // adjust path if needed
-require('dotenv').config();
+const Metadata = require("../models/Metadata");
 
 const encode = str => encodeURIComponent(str);
 
-// Simple text + tag search
 router.get("/", async (req, res) => {
   try {
-    const { q, tags } = req.query;
+    const { q, category } = req.query;
     const query = {};
 
-    // Searching in the 'fileName', 'description', 'category', and 'uploadedBy' fields
-    if (q) {
+    // Text search
+    if (q && q.trim() !== "") {
+      const searchRegex = { $regex: q, $options: "i" };
       query.$or = [
-        { fileName: { $regex: q, $options: "i" } },
-        { description: { $regex: q, $options: "i" } },
-        { category: { $regex: q, $options: "i" } },
-        { uploadedBy: { $regex: q, $options: "i" } },
+        { fileName: searchRegex },
+        { description: searchRegex },
+        { uploadedBy: searchRegex }
       ];
     }
 
-    // Handling the 'tags' array query
-    if (tags) {
-      const tagArray = tags.split(",").map(tag => tag.trim());
-      query.tags = { $in: tagArray };
+    // Category filter
+    if (category && category.trim() !== "") {
+      query.category = category;
     }
+
+    console.log("Executing query:", query);
 
     const results = await Metadata.find(query).sort({ uploadedAt: -1 }).limit(50);
 
     const formattedResults = results.map(doc => {
       const fileUrl = doc.fileUrl;
 
+      // Validate fileUrl
       if (
         !fileUrl ||
         typeof fileUrl !== "string" ||
-        fileUrl.includes("http") ||  // This prevents full URLs like https://...
+        fileUrl.includes("http") || // avoid full URLs
         fileUrl.includes("undefined")
       ) {
         console.log("Invalid fileUrl:", fileUrl);
@@ -43,7 +43,6 @@ router.get("/", async (req, res) => {
       }
 
       console.log("Found fileUrl:", fileUrl);
-
       const encodedPath = encode(fileUrl);
 
       return {
@@ -65,7 +64,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 router.get("/download/:encodedPath", async (req, res) => {
   try {
