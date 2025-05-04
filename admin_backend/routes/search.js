@@ -65,7 +65,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/download/*", async (req, res) => {
+router.get("/download/:encodedPath", async (req, res) => {
   try {
     const blobPath = decodeURIComponent(req.params.encodedPath);
     console.log("Decoded blobPath:", blobPath);
