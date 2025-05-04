@@ -1,5 +1,7 @@
 [![codecov](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access/branch/coverage_new/graph/badge.svg?token=ra9BZ66bio)](https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access)
 
+https://codecov.io/gh/KutlwanoMokubetsi/Constitutional-Access/graphs/tree.svg?token=ra9BZ66bio
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
