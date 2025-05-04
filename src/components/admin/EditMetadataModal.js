@@ -26,6 +26,12 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Manual validation
+    if (!metadata.name || !metadata.category) {
+      return; // Don't proceed with save
+    }
+    
     onSave({
       ...file,
       name: metadata.name,
@@ -61,6 +67,7 @@ const EditMetadataModal = ({ file, onClose, onSave }) => {
             <label className="block">
               <p className="text-sm font-medium text-gray-700">Category*</p>
               <select
+                id= "category"
                 value={metadata.category}
                 onChange={(e) => setMetadata({...metadata, category: e.target.value})}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"

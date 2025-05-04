@@ -49,6 +49,7 @@ const AdminHeader = () => {
                     ? 'bg-white/10 text-white' 
                     : 'text-white/90 hover:bg-white/5'
                 }`}
+                aria-label={item.name}
               >
                 {item.icon}
                 <span className="ml-2">{item.name}</span>
@@ -70,6 +71,8 @@ const AdminHeader = () => {
             <button
               onClick={toggleMenu}
               className="text-white hover:text-white/80 focus:outline-none"
+              aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

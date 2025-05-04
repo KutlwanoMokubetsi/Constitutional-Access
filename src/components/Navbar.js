@@ -60,6 +60,7 @@ const Navbar = () => {
           onClick={() => setIsOpen(!isOpen)}
           className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-200 focus:outline-none"
           aria-expanded={isOpen}
+          aria-label="Toggle navigation"
         >
           {isOpen ? (
             <X className="h-6 w-6" />
