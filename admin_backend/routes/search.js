@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
         excerpt: doc.description || "No description available",
         type: doc.category || "Unknown",
         relevance: `${Math.floor(Math.random() * 21) + 80}%`,
-        fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/search/download/${encodedPath}`,
+        fileUrl: `${process.env.REACT_APP_SEARCH_BACKEND_URL}/api/search/download/${encodedPath}`,
         uploadedAt: doc.uploadedAt,
       };
     }).filter(item => item !== null);
